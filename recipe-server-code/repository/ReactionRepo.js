@@ -12,6 +12,7 @@ const fetchReactionsByComment = async (commentId) => {
     return reactions;
 }
 
+
 const deleteReaction = async (reactionId) => {
     const reaction = await Reaction.findByIdAndDelete(reactionId);
     return reaction;
