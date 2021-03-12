@@ -1,0 +1,32 @@
+{
+  "name": "com.goodfood",
+  "version": "1.0.0",
+  "description": "this is the platform that hosts the recipes created by chefs or the common people and the interetsted users buy or watch it for free",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "Lalit Hajare",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.18.3",
+    "compression": "^1.7.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.16.3",
+    "express-fileupload": "^1.2.1",
+    "express-validator": "^5.3.0",
+    "generate-password": "^1.5.0",
+    "helmet": "^3.22.0",
+    "jsonwebtoken": "^8.3.0",
+    "mongo-cursor-pagination": "^7.3.1",
+    "mongoose": "^5.3.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
