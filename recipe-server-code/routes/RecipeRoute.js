@@ -50,6 +50,12 @@ router.get(
   recipeController.getRecipe
 );
 
+router.get(
+  '/featured',
+  isAuth,
+  recipeController.featuredRecipes
+);
+
 router.post(
   '/toggleUbuntu',
   isAuth,

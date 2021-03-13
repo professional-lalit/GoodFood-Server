@@ -1,6 +1,11 @@
 const Recipe = require('../entities/RecipeEntity');
 const { fetchUser } = require('../repository/UserRepo');
-const { fetchRecipe, addRecipe, updateRecipe, deleteRecipe, fetchRecipesByFilter, populateRecipeWithCommentsAndReactions } = require('../repository/RecipeRepo');
+const { 
+        fetchRecipe, addRecipe, 
+        updateRecipe, deleteRecipe, fetchRecipesByFilter,
+        populateRecipeWithCommentsAndReactions, 
+        fetchFeaturedRecipes 
+      } = require('../repository/RecipeRepo');
 const { getRecipeImagePath, getRecipeVideoPath } = require('../utils/MultiMediaPaths');
 const { isValid } = require('../utils/Utils');
 
@@ -13,7 +18,7 @@ exports.getRecipe = async (req, res, next) => {
         let recipe = await fetchRecipe(recipeId);
 
         if (recipe) {
-            recipe = await populateRecipeWithCommentsAndReactions(recipe);
+            recipe = await populateRecipeWithCommentsAndReactions(recipe);            
             return res.status(200).json({
                 message: 'Recipe fetched successfully.',
                 recipe: recipe
@@ -228,6 +233,27 @@ exports.deleteRecipe = async (req, res, next) => {
                 message: 'Recipe delete failed'                
             });
         }
+    }catch(err){
+        next(err);
+    }
+}
+
+exports.featuredRecipes = async (req, res, next) => {
+    if(!isValid(req, next))
+    return;
+
+    try{
+        const recipes = await fetchFeaturedRecipes();
+        if(recipes == null){
+            return res.status(200).json({
+                message: 'No featured recipes for now'                
+            });
+        }
+
+        return res.status(200).json({
+            message: 'featured recipes fetched successfully',
+            recipes: recipes                
+        });
     }catch(err){
         next(err);
     }

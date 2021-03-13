@@ -27,7 +27,15 @@ const fetchRecipesByFilter = async (title, priceRange, avgRatingRange, creator) 
         avgRating: { $gte: avgRatingRange.lowEnd || 0, $lte: avgRatingRange.highEnd || 5 },
         creatorId: creator
     }
-    return await Recipe.find(filter);    
+    //get the latest first
+    return await Recipe.find(filter).sort({ createdAt: -1 });    
+}
+
+const fetchFeaturedRecipes = async () => {
+    //get the latest first
+    const recipes = await Recipe.find({ isFeatured: true }).sort({ createdAt: -1 });
+    console.log('fetched featured recipes: ', recipes);
+    return recipes;
 }
 
 const addRecipe = async (creator, recipeData) => {
@@ -107,7 +115,7 @@ const populateRecipeWithCommentsAndReactions = async (recipe) => {
     .execPopulate();
   
     return recipe;
-  }
+}
 
 exports.fetchRecipe = fetchRecipe;
 exports.addCommentOnRecipe = addCommentOnRecipe;
@@ -116,3 +124,4 @@ exports.updateRecipe = updateRecipe;
 exports.deleteRecipe = deleteRecipe;
 exports.fetchRecipesByFilter = fetchRecipesByFilter;
 exports.populateRecipeWithCommentsAndReactions = populateRecipeWithCommentsAndReactions;
+exports.fetchFeaturedRecipes = fetchFeaturedRecipes;

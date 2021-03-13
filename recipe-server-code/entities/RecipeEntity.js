@@ -36,6 +36,10 @@ const recipeSchema = new Schema({
         ref: 'Comment',
         required: false
     },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
     ubuntuList: [{
         userId: {
           type: Schema.Types.ObjectId, ref: 'User'
