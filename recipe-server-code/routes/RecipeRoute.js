@@ -61,7 +61,7 @@ router.post(
   isAuth,
   [
     body('ubuntu').exists(),
-    query('commentId').not().isEmpty()
+    query('recipeId').not().isEmpty()
   ],
   recipeController.ubuntuRecipe
 );

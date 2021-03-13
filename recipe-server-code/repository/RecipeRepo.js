@@ -28,14 +28,36 @@ const fetchRecipesByFilter = async (title, priceRange, avgRatingRange, creator) 
         creatorId: creator
     }
     //get the latest first
-    return await Recipe.find(filter).sort({ createdAt: -1 });    
+    const recipes = await Recipe.find(filter).sort({ createdAt: -1 });        
+    return setUbuntuCount(recipes);
+}
+
+const setUbuntuCount = (recipes) => {
+    const modifiedRecipes = [];
+    for(const recipe of recipes){
+        const modifiedRecipe = recipe.toJSON();
+        if(modifiedRecipe.ubuntuList != null){
+            modifiedRecipe.likeCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+                return ubuntu.ubuntuType == 'like';
+            }).length;
+            modifiedRecipe.smileyCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+                return ubuntu.ubuntuType == 'smiley';
+            }).length;
+            modifiedRecipe.prayerCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+                return ubuntu.ubuntuType == 'prayer';
+            }).length;
+        }
+        delete modifiedRecipe.ubuntuList;
+        modifiedRecipes.push(modifiedRecipe);
+    }
+    return modifiedRecipes;
 }
 
 const fetchFeaturedRecipes = async () => {
     //get the latest first
     const recipes = await Recipe.find({ isFeatured: true }).sort({ createdAt: -1 });
     console.log('fetched featured recipes: ', recipes);
-    return recipes;
+    return setUbuntuCount(recipes);
 }
 
 const addRecipe = async (creator, recipeData) => {

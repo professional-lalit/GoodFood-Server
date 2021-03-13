@@ -54,3 +54,5 @@ const recipeSchema = new Schema({
   );
   
   module.exports = mongoose.model('Recipe', recipeSchema);
+
+  //ubuntuType: smiley, like, prayer
