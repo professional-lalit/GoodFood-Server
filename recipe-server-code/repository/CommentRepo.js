@@ -25,6 +25,16 @@ const fetchCommentsByRecipe = async (recipeId) => {
   return result;
 }
 
+const getAvgRatingFromCommentsOfRecipe = async (recipeId) => {
+  let comments = await Comment.find( { recipeId: recipeId } )
+  console.log('fetched comments: ',comments);
+  let totalRating = 0;
+  for(const comment of comments){
+    totalRating += comment.rating;
+  }
+  return (totalRating / comments.length);
+}
+
 const populateCommentWithReactions = async (comment) => {
   await comment.populate({
     path: 'reactions',
@@ -74,3 +84,4 @@ exports.fetchComment = fetchComment;
 exports.populateCommentWithReactions = populateCommentWithReactions;
 exports.fetchCommentsByRecipe = fetchCommentsByRecipe;
 exports.deleteComment = deleteComment;
+exports.getAvgRatingFromCommentsOfRecipe = getAvgRatingFromCommentsOfRecipe;

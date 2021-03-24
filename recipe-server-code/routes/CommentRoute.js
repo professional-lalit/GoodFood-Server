@@ -55,7 +55,8 @@ router.delete(
   '/deleteComment',
   isAuth,
   [
-    query('commentId').not().isEmpty()
+    query('commentId').not().isEmpty(),
+    query('recipeId').not().isEmpty()
   ],
   commentController.deleteComment
 );
@@ -65,7 +66,7 @@ router.delete(
   isAuth,
   [
     query('commentId').not().isEmpty(),
-    query('reactionId').not().isEmpty()
+    query('recipeId').not().isEmpty()
   ],
   commentController.deleteReaction
 );

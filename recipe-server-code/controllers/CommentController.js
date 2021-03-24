@@ -147,10 +147,12 @@ exports.deleteComment = async (req, res, next) => {
         return;
     
     const commentId = req.query.commentId;
+    const recipeId = req.query.recipeId;
 
     try{    
         const commentatorId = req.userId;
         const comment = await fetchComment(commentId);
+        const recipe = await fetchRecipe(recipeId);
 
         if(comment == null){
             return res.status(400).json({
@@ -159,6 +161,11 @@ exports.deleteComment = async (req, res, next) => {
         }
 
         if(comment.commentator._id == commentatorId){
+            if(recipe){
+                const index = recipe.comments.indexOf(comment);
+                recipe.comments.splice(index, 1);
+                await recipe.save();
+            }
             //delete
             const deletedComment = await deleteComment(comment._id);
             return res.status(200).json({
@@ -205,11 +212,15 @@ exports.deleteReaction = async (req, res, next) => {
             await comment.save();
         }
 
-       const deletedReaction = await Reaction.findOneAndDelete(reactionId);
-       if(deletedReaction){
-            return res.status(400).json({
-                message: 'Reaction not found',
+       const deletedReaction = await Reaction.findByIdAndDelete(reactionId);
+       if(deletedReaction){            
+            return res.status(200).json({
+                message: 'Reaction deleted',
                 deletedReaction: deletedReaction
+            });
+       }else{
+            return res.status(400).json({
+                message: 'Reaction not found'
             });
        }
 

@@ -6,6 +6,8 @@ const { fetchRecipe } = require('../repository/RecipeRepo');
 const { getProfileImagePath, getProfileVideoPath } = require('../utils/MultiMediaPaths');
 const { isValid } = require('../utils/Utils');
 
+const fs = require('fs');
+
 exports.getUser = async (req, res, next) => {
     if(!isValid(req, next))
         return;
@@ -14,6 +16,11 @@ exports.getUser = async (req, res, next) => {
     try{
         const user = await fetchUser(userId); 
         if (user) {
+
+            const userId = user._id;
+            const imageUrl = `http://localhost:8080/profile_images/PROFILE_IMG_${userId}`
+            user.imageUrl = imageUrl;
+            
             return res.status(200).json({
                 message: 'User fetched successfully.',
                 user: user
@@ -74,8 +81,9 @@ exports.uploadProfileImage = async (req, res, next) => {
     if(!isValid(req, next))
         return;
 
+    const userId = req.userId;
     const image = req.files.profileImage
-    const profileImagePath = getProfileImagePath(image);
+    const profileImagePath = getProfileImagePath(userId);
 
     image.mv(profileImagePath, (error) => {
         if (error) {

@@ -1,4 +1,5 @@
 const Recipe = require('../entities/RecipeEntity');
+const { getAvgRatingFromCommentsOfRecipe } = require('./CommentRepo');
 
 const fetchRecipe = async (recipeId) => {
     try{
@@ -10,26 +11,15 @@ const fetchRecipe = async (recipeId) => {
     }    
 }
 
-const fetchRecipesByCreator = async (creatorId) => {
-    try{
-        let recipes = await Recipe.find({ creatorId: creatorId });
-        console.log('fetched recipe details', recipe);
-        return recipes;
-    }catch(err){
-        return undefined;
-    }    
-}
-
 const fetchRecipesByFilter = async (title, priceRange, avgRatingRange, creator) => {
     const filter = {
         title: { "$regex": title },
         price: { $gte: priceRange.lowEnd || 0, $lte: priceRange.highEnd || 1000000000 },
         avgRating: { $gte: avgRatingRange.lowEnd || 0, $lte: avgRatingRange.highEnd || 5 },
-        creatorId: creator
+        creatorId: creator || undefined
     }
     //get the latest first
-    const recipes = await Recipe.find(filter).sort({ createdAt: -1 });        
-    return setUbuntuCount(recipes);
+    return await Recipe.find(filter).sort({ createdAt: -1 });         
 }
 
 const setUbuntuCount = (recipes) => {
@@ -53,6 +43,23 @@ const setUbuntuCount = (recipes) => {
     return modifiedRecipes;
 }
 
+const setUbuntuCountForSingleRecipe = (recipe) => {
+    const modifiedRecipe = recipe.toJSON();
+    if(modifiedRecipe.ubuntuList != null){
+        modifiedRecipe.likeCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+            return ubuntu.ubuntuType == 'like';
+        }).length;
+        modifiedRecipe.smileyCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+            return ubuntu.ubuntuType == 'smiley';
+        }).length;
+        modifiedRecipe.prayerCount = modifiedRecipe.ubuntuList.filter(function(ubuntu) {
+            return ubuntu.ubuntuType == 'prayer';
+        }).length;
+    }
+    delete modifiedRecipe.ubuntuList;
+    return modifiedRecipe;
+}
+
 const fetchFeaturedRecipes = async () => {
     //get the latest first
     const recipes = await Recipe.find({ isFeatured: true }).sort({ createdAt: -1 });
@@ -62,13 +69,14 @@ const fetchFeaturedRecipes = async () => {
 
 const addRecipe = async (creator, recipeData) => {
     const recipe = new Recipe(recipeData);
+    delete recipeData.avgRating;
     recipe.creatorId = creator;
     console.log("after recipe created, creatorId: ",recipe.creatorId);
     return await recipe.save();
 }
 
 const updateRecipe = async (recipeId, recipeData) => {
-    const { title, description, price, imageUrls, videoUrl, avgRating} = recipeData;
+    const { title, description, price, imageUrls, videoUrl} = recipeData;
     const recipe = await fetchRecipe(recipeId);
 
     if(recipe){
@@ -77,7 +85,6 @@ const updateRecipe = async (recipeId, recipeData) => {
         recipe.price = price;
         recipe.imageUrls = imageUrls;
         recipe.videoUrl = videoUrl;
-        recipe.avgRating = avgRating;
         console.log("after recipe update, creatorId: ",recipe.creatorId);
         return await recipe.save();
     }
@@ -90,8 +97,10 @@ const deleteRecipe = async (recipeId) => {
 
 const addCommentOnRecipe = async (recipeId, comment) => {
     let recipe = await fetchRecipe(recipeId);   
+    
     if(recipe){ 
         recipe.comments.push(comment);
+        recipe.avgRating = await getAvgRatingFromCommentsOfRecipe(recipeId);
         let updatedRecipe = await recipe.save();
         return updatedRecipe;
     }
@@ -147,3 +156,5 @@ exports.deleteRecipe = deleteRecipe;
 exports.fetchRecipesByFilter = fetchRecipesByFilter;
 exports.populateRecipeWithCommentsAndReactions = populateRecipeWithCommentsAndReactions;
 exports.fetchFeaturedRecipes = fetchFeaturedRecipes;
+exports.setUbuntuCountForSingleRecipe = setUbuntuCountForSingleRecipe;
+exports.setUbuntuCount = setUbuntuCount;

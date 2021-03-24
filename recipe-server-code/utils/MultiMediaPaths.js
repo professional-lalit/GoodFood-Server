@@ -1,7 +1,8 @@
 const path = require('path');
 
-const getProfileImagePath = (image) => {
-    return path.join(__dirname, '..', '/multimedia', 'profile', 'images', image.name);
+
+const getProfileImagePath = (userId) => {
+    return path.join(__dirname, '..', '/multimedia', 'profile', 'images', `PROFILE_IMG_${userId}.jpg`);
 }
 
 const getProfileVideoPath = (video) => {
