@@ -180,16 +180,24 @@ exports.uploadRecipeImage = async (req, res, next) => {
     if(!isValid(req, next))
         return;
 
-    const image = req.files.recipeImage
+    const image = req.files.recipeImage;
+    const recipeId = req.query.recipeId;
     const recipeImagePath = getRecipeImagePath(image);
+    let recipe = await fetchRecipe(recipeId);
 
     image.mv(recipeImagePath, (error) => {
         if (error) {
             next(error);
         }else{
+            const url = `http://localhost:8080/recipe_images/${image.name}`;
+            if(!recipe.imageUrls){
+                recipe.imageUrls = [];        
+            }
+            recipe.imageUrls.push(url);
+            updateRecipe(recipeId, recipe);
             return res.status(200).json({
                 message: 'Recipe image uploaded successfully',
-                recipeImageUrl: `http://localhost:8080/profile_images/${image.name}`
+                recipeImageUrl: url
             });
         }
       })
@@ -199,16 +207,24 @@ exports.uploadRecipeVideo = async (req, res, next) => {
     if(!isValid(req, next))
         return;
 
-    const video = req.files.recipeVideo
+    const video = req.files.recipeVideo;
+    const recipeId = req.query.recipeId;
     const recipeVideoPath = getRecipeVideoPath(video);
+    let recipe = await fetchRecipe(recipeId);
 
      video.mv(recipeVideoPath, (error) => {
         if (error) {
             next(error);
         }else{
+            const url = `http://localhost:8080/recipe_videos/${video.name}`;
+            if(!recipe.videoUrls){
+                recipe.videoUrls = [];        
+            }
+            recipe.videoUrls.push(url);
+            updateRecipe(recipeId, recipe);
             return res.status(200).json({
                 message: 'Recipe video uploaded successfully',
-                recipeVideoUrl: `http://localhost:8080/recipe_videos/${video.name}`
+                recipeVideoUrl: url
             });
         }
       })

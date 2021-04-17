@@ -12,13 +12,45 @@ exports.getUser = async (req, res, next) => {
     if(!isValid(req, next))
         return;
         
-    const userId = req.userId;
+    const userId = req.query.userId;
     try{
         const user = await fetchUser(userId); 
         if (user) {
 
             const userId = user._id;
             const imageUrl = `http://localhost:8080/profile_images/PROFILE_IMG_${userId}`
+            user.imageUrl = imageUrl;
+            
+            return res.status(200).json({
+                message: 'User fetched successfully.',
+                user: user
+            });
+        } else {
+            return res.status(400).json({
+                message: 'User not found'
+            });
+        }       
+    }catch(err){
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.getMeUser = async (req, res, next) => {
+    if(!isValid(req, next))
+        return;
+        
+    const userId = req.userId;
+    try{
+        const user = await fetchUser(userId); 
+        if (user) {
+
+            const userId = user._id;
+            const imageUrl = `http://10.0.2.2:8080/profile_images/PROFILE_IMG_${userId}.jpg`
+            //test
+            // const imageUrl = `http://10.0.2.2:8080/profile_images/PROFILE_IMG_605b91943b6cb5048d424a53.jpg`
             user.imageUrl = imageUrl;
             
             return res.status(200).json({

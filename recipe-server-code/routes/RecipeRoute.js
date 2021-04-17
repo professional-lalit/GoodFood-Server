@@ -66,4 +66,22 @@ router.post(
   recipeController.ubuntuRecipe
 );
 
+router.post(
+  '/imageUpload',
+  isAuth,
+  [
+    query('recipeId').not().isEmpty()
+  ],
+  recipeController.uploadRecipeImage
+);
+
+router.post(
+  '/videoUpload',
+  isAuth,
+  [
+    query('recipeId').not().isEmpty()
+  ],
+  recipeController.uploadRecipeVideo
+);
+
 module.exports = router;

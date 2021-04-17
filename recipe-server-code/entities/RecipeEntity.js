@@ -18,8 +18,8 @@ const recipeSchema = new Schema({
         type: [String],
         required: false
     },
-    videoUrl: {
-        type: String,
+    videoUrls: {
+        type: [String],
         required: false
     },
     creatorId: {

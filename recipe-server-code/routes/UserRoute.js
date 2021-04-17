@@ -15,6 +15,12 @@ router.get(
   userController.getUser
 );
 
+router.get(
+  '/me',
+  isAuth,
+  userController.getMeUser
+);
+
 router.put(
   '/update',
   isAuth,
