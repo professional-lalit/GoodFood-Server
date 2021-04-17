@@ -12,12 +12,21 @@ const fetchRecipe = async (recipeId) => {
 }
 
 const fetchRecipesByFilter = async (title, priceRange, avgRatingRange, creator) => {
-    const filter = {
-        title: { "$regex": title },
-        price: { $gte: priceRange.lowEnd || 0, $lte: priceRange.highEnd || 1000000000 },
-        avgRating: { $gte: avgRatingRange.lowEnd || 0, $lte: avgRatingRange.highEnd || 5 },
-        creatorId: creator || undefined
-    }
+    let filter;
+    if(creator){
+        filter = {
+            title: { "$regex": title },
+            price: { $gte: priceRange.lowEnd || 0, $lte: priceRange.highEnd || 1000000000 },
+            avgRating: { $gte: avgRatingRange.lowEnd || 0, $lte: avgRatingRange.highEnd || 5 },
+            creatorId: creator || undefined
+        }
+    }else{
+        filter = {
+            title: { "$regex": title },
+            price: { $gte: priceRange.lowEnd || 0, $lte: priceRange.highEnd || 1000000000 },
+            avgRating: { $gte: avgRatingRange.lowEnd || 0, $lte: avgRatingRange.highEnd || 5 }
+        }
+    } 
     //get the latest first
     return await Recipe.find(filter).sort({ createdAt: -1 });         
 }
@@ -70,7 +79,9 @@ const fetchFeaturedRecipes = async () => {
 const addRecipe = async (creator, recipeData) => {
     const recipe = new Recipe(recipeData);
     delete recipeData.avgRating;
+    delete creator.password;
     recipe.creatorId = creator;
+    recipe.creator = creator;
     console.log("after recipe created, creatorId: ",recipe.creatorId);
     return await recipe.save();
 }
@@ -148,6 +159,14 @@ const populateRecipeWithCommentsAndReactions = async (recipe) => {
     return recipe;
 }
 
+const populateRecipeWithCreator = async (recipe) => {
+    await recipe.populate({
+      path: 'creator',
+      model: 'User',
+    }).execPopulate();
+    return recipe;
+}
+
 exports.fetchRecipe = fetchRecipe;
 exports.addCommentOnRecipe = addCommentOnRecipe;
 exports.addRecipe = addRecipe;
@@ -155,6 +174,7 @@ exports.updateRecipe = updateRecipe;
 exports.deleteRecipe = deleteRecipe;
 exports.fetchRecipesByFilter = fetchRecipesByFilter;
 exports.populateRecipeWithCommentsAndReactions = populateRecipeWithCommentsAndReactions;
+exports.populateRecipeWithCreator = populateRecipeWithCreator;
 exports.fetchFeaturedRecipes = fetchFeaturedRecipes;
 exports.setUbuntuCountForSingleRecipe = setUbuntuCountForSingleRecipe;
 exports.setUbuntuCount = setUbuntuCount;

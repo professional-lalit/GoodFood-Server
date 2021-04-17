@@ -6,7 +6,8 @@ const {
         populateRecipeWithCommentsAndReactions, 
         setUbuntuCountForSingleRecipe,
         setUbuntuCount,
-        fetchFeaturedRecipes 
+        fetchFeaturedRecipes, 
+        populateRecipeWithCreator
       } = require('../repository/RecipeRepo');
 const { getRecipeImagePath, getRecipeVideoPath } = require('../utils/MultiMediaPaths');
 const { isValid } = require('../utils/Utils');
@@ -62,7 +63,8 @@ exports.getRecipeList = async (req, res, next) => {
         let recipes = await fetchRecipesByFilter(title, priceRange, avgRatingRange, user);
         if (recipes) {
             for(let recipe of recipes){
-                recipe = await populateRecipeWithCommentsAndReactions(recipe);  
+                recipe = await populateRecipeWithCommentsAndReactions(recipe);
+                recipe = await populateRecipeWithCreator(recipe);  
             }
             recipes = setUbuntuCount(recipes);
             return res.status(200).json({

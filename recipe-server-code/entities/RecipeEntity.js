@@ -27,6 +27,11 @@ const recipeSchema = new Schema({
         ref: 'User',
         required: true
     },
+    creator: {
+        type:  Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    },
     avgRating: {
         type: Number,
         default: 0
