@@ -126,8 +126,6 @@ exports.changePassword = async (req, res, next) => {
       }
       next(err);
   }
-
-
 }
 
 exports.forgotPassword = async (req, res, next) => {

@@ -22,11 +22,6 @@ const recipeSchema = new Schema({
         type: [String],
         required: false
     },
-    creatorId: {
-        type:  Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
     creator: {
         type:  Schema.Types.ObjectId,
         ref: 'User',

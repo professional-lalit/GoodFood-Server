@@ -39,11 +39,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/profile_images', [ isAuth, express.static(path.join(__dirname, 'multimedia/profile/images')) ]);
-app.use('/profile_videos', [ isAuth, express.static(path.join(__dirname, 'multimedia/profile/videos')) ]);
+app.use('/profile_images', [ express.static(path.join(__dirname, 'multimedia/profile/images')) ]);
+app.use('/profile_videos', [ express.static(path.join(__dirname, 'multimedia/profile/videos')) ]);
 
 app.use('/recipe_images', [ express.static(path.join(__dirname, 'multimedia/recipe/images')) ]);
-app.use('/recipe_videos', [ isAuth, express.static(path.join(__dirname, 'multimedia/recipe/videos')) ]);
+app.use('/recipe_videos', [ express.static(path.join(__dirname, 'multimedia/recipe/videos')) ]);
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);

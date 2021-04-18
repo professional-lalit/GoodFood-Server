@@ -45,14 +45,7 @@ exports.getMeUser = async (req, res, next) => {
     const userId = req.userId;
     try{
         const user = await fetchUser(userId); 
-        if (user) {
-
-            const userId = user._id;
-            const imageUrl = `http://10.0.2.2:8080/profile_images/PROFILE_IMG_${userId}.jpg`
-            //test
-            // const imageUrl = `http://10.0.2.2:8080/profile_images/PROFILE_IMG_605b91943b6cb5048d424a53.jpg`
-            user.imageUrl = imageUrl;
-            
+        if (user) {                    
             return res.status(200).json({
                 message: 'User fetched successfully.',
                 user: user
@@ -81,12 +74,18 @@ exports.updateUser = async (req, res, next) => {
     try {
         const user = await User.findOne({ '_id': userId });
         if (user) {
-            user.firstName = userData.firstName;
-            user.lastName = userData.lastName;
-            user.address = userData.address;
-            user.bio = userData.bio;
-            user.imageUrl = userData.imageUrl;
-            user.videoUrl = userData.videoUrl;
+            if(firstName)
+                user.firstName = userData.firstName;
+            if(lastName)
+                user.lastName = userData.lastName;
+            if(address)
+                user.address = userData.address;
+            if(bio)
+                user.bio = userData.bio;
+            if(imageUrl)
+                user.imageUrl = userData.imageUrl;
+            if(firstName)
+                user.videoUrl = userData.videoUrl;
 
             const updatedUser = await user.save();
 
@@ -117,13 +116,17 @@ exports.uploadProfileImage = async (req, res, next) => {
     const image = req.files.profileImage
     const profileImagePath = getProfileImagePath(userId);
 
-    image.mv(profileImagePath, (error) => {
+    image.mv(profileImagePath, async (error) => {
         if (error) {
             next(error);
-        }else{
+        }else{               
+            const profileImageUrl = `http://localhost:8080/profile_images/PROFILE_IMG_${userId}.jpg`;
+            const user = await fetchUser(userId);
+            user.imageUrl = profileImageUrl;
+            user.save();
             return res.status(200).json({
                 message: 'Profile image uploaded successfully',
-                profileImageUrl: `http://localhost:8080/profile_images/${image.name}`
+                profileImageUrl: profileImageUrl
             });
         }
       })

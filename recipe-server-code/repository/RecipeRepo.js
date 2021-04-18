@@ -80,14 +80,13 @@ const addRecipe = async (creator, recipeData) => {
     const recipe = new Recipe(recipeData);
     delete recipeData.avgRating;
     delete creator.password;
-    recipe.creatorId = creator;
     recipe.creator = creator;
     console.log("after recipe created, creatorId: ",recipe.creatorId);
     return await recipe.save();
 }
 
 const updateRecipe = async (recipeId, recipeData) => {
-    const { title, description, price, imageUrls, videoUrl} = recipeData;
+    const { title, description, price, imageUrls, videoUrls} = recipeData;
     const recipe = await fetchRecipe(recipeId);
 
     if(recipe){
@@ -95,7 +94,7 @@ const updateRecipe = async (recipeId, recipeData) => {
         recipe.description = description;
         recipe.price = price;
         recipe.imageUrls = imageUrls;
-        recipe.videoUrl = videoUrl;
+        recipe.videoUrls = videoUrls;
         console.log("after recipe update, creatorId: ",recipe.creatorId);
         return await recipe.save();
     }

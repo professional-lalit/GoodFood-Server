@@ -38,7 +38,7 @@ const userSchema = new Schema({
       type: String,
       required: true
     },
-    status: {
+    registrationStatus: {
       type: String,
       default: 'unverified'
     }

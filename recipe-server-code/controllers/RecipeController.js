@@ -66,6 +66,7 @@ exports.getRecipeList = async (req, res, next) => {
                 recipe = await populateRecipeWithCommentsAndReactions(recipe);
                 recipe = await populateRecipeWithCreator(recipe);  
             }
+            console.log('recipes:', recipes);
             recipes = setUbuntuCount(recipes);
             return res.status(200).json({
                 message: 'Recipe list fetched successfully.',
