@@ -18,8 +18,9 @@ const recipeSchema = new Schema({
         type: [String],
         required: false
     },
-    videoUrls: {
-        type: [String],
+    videos: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Video',
         required: false
     },
     creator: {

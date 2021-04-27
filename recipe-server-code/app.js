@@ -44,6 +44,8 @@ app.use('/profile_videos', [ express.static(path.join(__dirname, 'multimedia/pro
 
 app.use('/recipe_images', [ express.static(path.join(__dirname, 'multimedia/recipe/images')) ]);
 app.use('/recipe_videos', [ express.static(path.join(__dirname, 'multimedia/recipe/videos')) ]);
+app.use('/recipe_video_thumbnails', [ express.static(path.join(__dirname, 
+        'multimedia/recipe/videos/thumbnails')) ]);
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);

@@ -1,4 +1,5 @@
 const Recipe = require('../entities/RecipeEntity');
+const Video = require('../entities/VideoEntity');
 const { getAvgRatingFromCommentsOfRecipe } = require('./CommentRepo');
 
 const fetchRecipe = async (recipeId) => {
@@ -85,8 +86,18 @@ const addRecipe = async (creator, recipeData) => {
     return await recipe.save();
 }
 
-const updateRecipe = async (recipeId, recipeData) => {
-    const { title, description, price, imageUrls, videoUrls} = recipeData;
+const addRecipeVideo = async (creator, thumbUrl, url, title) => {
+    const video = new Video();
+    video.creator = creator;
+    video.thumbUrl = thumbUrl;
+    video.url = url;
+    video.title = title;
+    console.log("after recipe created, creatorId: ",video.creatorId);
+    return await video.save();
+}
+
+const updateRecipe = async (recipeId, recipeData, video) => {
+    const { title, description, price, imageUrls} = recipeData;
     const recipe = await fetchRecipe(recipeId);
 
     if(recipe){
@@ -94,8 +105,13 @@ const updateRecipe = async (recipeId, recipeData) => {
         recipe.description = description;
         recipe.price = price;
         recipe.imageUrls = imageUrls;
-        recipe.videoUrls = videoUrls;
-        console.log("after recipe update, creatorId: ",recipe.creatorId);
+        
+        if(!recipe.videos){
+            recipe.videos = [];
+        }
+        recipe.videos.push(video);
+
+        console.log("after recipe update, creatorId: ",recipe.creator);
         return await recipe.save();
     }
     return undefined;
@@ -169,6 +185,7 @@ const populateRecipeWithCreator = async (recipe) => {
 exports.fetchRecipe = fetchRecipe;
 exports.addCommentOnRecipe = addCommentOnRecipe;
 exports.addRecipe = addRecipe;
+exports.addRecipeVideo = addRecipeVideo;
 exports.updateRecipe = updateRecipe;
 exports.deleteRecipe = deleteRecipe;
 exports.fetchRecipesByFilter = fetchRecipesByFilter;

@@ -7,9 +7,10 @@ const {
         setUbuntuCountForSingleRecipe,
         setUbuntuCount,
         fetchFeaturedRecipes, 
-        populateRecipeWithCreator
+        populateRecipeWithCreator,
+        addRecipeVideo
       } = require('../repository/RecipeRepo');
-const { getRecipeImagePath, getRecipeVideoPath } = require('../utils/MultiMediaPaths');
+const { getRecipeImagePath, getRecipeVideoPath, getRecipeVideoThumbPath } = require('../utils/MultiMediaPaths');
 const { isValid } = require('../utils/Utils');
 
 exports.getRecipe = async (req, res, next) => {
@@ -22,6 +23,7 @@ exports.getRecipe = async (req, res, next) => {
 
         if (recipe) {
             recipe = await populateRecipeWithCommentsAndReactions(recipe);   
+            recipe = await populateRecipeWithCreator(recipe);  
             recipe = setUbuntuCountForSingleRecipe(recipe);         
             return res.status(200).json({
                 message: 'Recipe fetched successfully.',
@@ -206,29 +208,64 @@ exports.uploadRecipeImage = async (req, res, next) => {
       })
 }
 
+function copyThumbnail(thumbImage, callback) {
+    const recipeVideoThumbPath = getRecipeVideoThumbPath(thumbImage);
+    thumbImage.mv(recipeVideoThumbPath, (error) => {
+        if(!error){
+            callback(true);
+        }else{
+            callback(false);
+        }        
+    })
+}
+
 exports.uploadRecipeVideo = async (req, res, next) => {
     if(!isValid(req, next))
         return;
 
+    const userId = req.userId;    
     const video = req.files.recipeVideo;
+    const videoThumb = req.files.recipeVideoThumb;
+    const title = req.query.title;
     const recipeId = req.query.recipeId;
     const recipeVideoPath = getRecipeVideoPath(video);
-    let recipe = await fetchRecipe(recipeId);
 
-     video.mv(recipeVideoPath, (error) => {
+    let recipe = await fetchRecipe(recipeId);
+    let user = await fetchUser(userId);
+
+     video.mv(recipeVideoPath, async (error) => {
         if (error) {
             next(error);
         }else{
             const url = `http://localhost:8080/recipe_videos/${video.name}`;
-            if(!recipe.videoUrls){
-                recipe.videoUrls = [];        
+            try{
+                if(videoThumb){
+                    copyThumbnail(videoThumb, async (isCopied) => {
+                        let video;
+                        if(isCopied){
+                            const thumbUrl = `http://localhost:8080/recipe_video_thumbnails/${videoThumb.name}`;
+                            video = await addRecipeVideo(user, thumbUrl, url, title);        
+                        }else{
+                            video = await addRecipeVideo(user, "", url, title);        
+                        }        
+                        const savedRecipe = await updateRecipe(recipeId, recipe, video);
+                        return res.status(200).json({
+                            message: 'Video uploaded successfully',
+                            video: video
+                        });
+                    });       
+                } else{
+                    savedVideo = await addRecipeVideo(user, "", url, title);                            
+                    const savedRecipe = await updateRecipe(recipeId, recipe, savedVideo);
+                    return res.status(200).json({
+                        message: 'Video uploaded successfully',
+                        video: savedVideo
+                    });
+                }    
+            }catch(ex){
+                console.log('error while uplaoding recipe video', ex);
+                next(ex);
             }
-            recipe.videoUrls.push(url);
-            updateRecipe(recipeId, recipe);
-            return res.status(200).json({
-                message: 'Recipe video uploaded successfully',
-                recipeVideoUrl: url
-            });
         }
       })
 }
