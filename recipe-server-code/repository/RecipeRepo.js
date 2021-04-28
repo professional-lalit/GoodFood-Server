@@ -106,10 +106,12 @@ const updateRecipe = async (recipeId, recipeData, video) => {
         recipe.price = price;
         recipe.imageUrls = imageUrls;
         
-        if(!recipe.videos){
-            recipe.videos = [];
+        if(video){
+            if(!recipe.videos){
+                recipe.videos = [];
+            }
+            recipe.videos.push(video);
         }
-        recipe.videos.push(video);
 
         console.log("after recipe update, creatorId: ",recipe.creator);
         return await recipe.save();

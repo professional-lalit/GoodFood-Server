@@ -193,7 +193,7 @@ exports.uploadRecipeImage = async (req, res, next) => {
     const recipeImagePath = getRecipeImagePath(image);
     let recipe = await fetchRecipe(recipeId);
 
-    image.mv(recipeImagePath, (error) => {
+    image.mv(recipeImagePath, async (error) => {
         if (error) {
             next(error);
         }else{
@@ -202,7 +202,7 @@ exports.uploadRecipeImage = async (req, res, next) => {
                 recipe.imageUrls = [];        
             }
             recipe.imageUrls.push(url);
-            updateRecipe(recipeId, recipe);
+            await recipe.save();
             return res.status(200).json({
                 message: 'Recipe image uploaded successfully',
                 recipeImageUrl: url
