@@ -8,6 +8,7 @@ const {
         setUbuntuCount,
         fetchFeaturedRecipes, 
         populateRecipeWithCreator,
+        populateRecipeWithVideos,
         addRecipeVideo
       } = require('../repository/RecipeRepo');
 const { getRecipeImagePath, getRecipeVideoPath, getRecipeVideoThumbPath } = require('../utils/MultiMediaPaths');
@@ -23,7 +24,8 @@ exports.getRecipe = async (req, res, next) => {
 
         if (recipe) {
             recipe = await populateRecipeWithCommentsAndReactions(recipe);   
-            recipe = await populateRecipeWithCreator(recipe);  
+            recipe = await populateRecipeWithCreator(recipe);
+            recipe = await populateRecipeWithVideos(recipe);  
             recipe = setUbuntuCountForSingleRecipe(recipe);         
             return res.status(200).json({
                 message: 'Recipe fetched successfully.',
@@ -67,6 +69,7 @@ exports.getRecipeList = async (req, res, next) => {
             for(let recipe of recipes){
                 recipe = await populateRecipeWithCommentsAndReactions(recipe);
                 recipe = await populateRecipeWithCreator(recipe);  
+                recipe = await populateRecipeWithVideos(recipe);  
             }
             console.log('recipes:', recipes);
             recipes = setUbuntuCount(recipes);

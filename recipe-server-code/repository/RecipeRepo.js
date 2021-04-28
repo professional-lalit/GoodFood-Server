@@ -182,6 +182,14 @@ const populateRecipeWithCreator = async (recipe) => {
     return recipe;
 }
 
+const populateRecipeWithVideos = async (recipe) => {
+    await recipe.populate({
+      path: 'videos',
+      model: 'Video',
+    }).execPopulate();
+    return recipe;
+}
+
 exports.fetchRecipe = fetchRecipe;
 exports.addCommentOnRecipe = addCommentOnRecipe;
 exports.addRecipe = addRecipe;
@@ -191,6 +199,7 @@ exports.deleteRecipe = deleteRecipe;
 exports.fetchRecipesByFilter = fetchRecipesByFilter;
 exports.populateRecipeWithCommentsAndReactions = populateRecipeWithCommentsAndReactions;
 exports.populateRecipeWithCreator = populateRecipeWithCreator;
+exports.populateRecipeWithVideos = populateRecipeWithVideos;
 exports.fetchFeaturedRecipes = fetchFeaturedRecipes;
 exports.setUbuntuCountForSingleRecipe = setUbuntuCountForSingleRecipe;
 exports.setUbuntuCount = setUbuntuCount;
