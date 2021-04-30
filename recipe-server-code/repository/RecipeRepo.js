@@ -165,12 +165,11 @@ const populateRecipeWithCommentsAndReactions = async (recipe) => {
               ]
           },
           {
-              path: 'reactor',
+              path: 'commentator',
               model: 'User',
           }
       ]
     })
-    .populate('commentator')
     .execPopulate();
   
     return recipe;
